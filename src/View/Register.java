@@ -103,13 +103,15 @@ public class Register extends javax.swing.JPanel {
         } else if (!passwordFld.getText().equals(confpassFld.getText())) {
             javax.swing.JOptionPane.showMessageDialog(frame, "Passwords do not match.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
             return;
-        } else if (passwordFld.getText().length() < 8) {
-            javax.swing.JOptionPane.showMessageDialog(frame, "Password must be at least 8 characters long.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        } else if (frame.isUserExist(usernameFld.getText())) {
+            javax.swing.JOptionPane.showMessageDialog(frame, "Username already exists.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
             return;
         }
         frame.registerAction(usernameFld.getText(), passwordFld.getText(), confpassFld.getText());
         frame.loginNav();
     }//GEN-LAST:event_registerBtnActionPerformed
+
+
 
     private void backBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backBtnActionPerformed
         frame.loginNav();

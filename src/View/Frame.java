@@ -257,13 +257,12 @@ public class Frame extends javax.swing.JFrame {
     }
     
     public void registerAction(String username, String password, String confpass){
-        // check if password and confirm password match and do this securely
-        if (!password.equals(confpass)) {
-            // Show error message
-            System.out.println("Passwords do not match!");
-            return;
-        }
         main.sqlite.addUser(username, password);
+    }
+
+    public boolean isUserExist(String username){
+
+        return main.sqlite.isUserExist(username);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

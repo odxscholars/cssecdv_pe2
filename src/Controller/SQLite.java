@@ -318,4 +318,37 @@ public class SQLite {
         }
         return product;
     }
+
+    public User getUser(String username){
+        String sql = "SELECT id, username, password, role, locked FROM users WHERE username='" + username + "';";
+        User user = null;
+        try (Connection conn = DriverManager.getConnection(driverURL);
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql)){
+            user = new User(rs.getInt("id"),
+                                   rs.getString("username"),
+                                   rs.getString("password"),
+                                   rs.getInt("role"),
+                                   rs.getInt("locked"));
+        } catch (Exception ex) {
+            System.out.print(ex);
+        }
+        return user;
+    }
+
+    public boolean isUserExist(String username) {
+        String sql = "SELECT username FROM users WHERE username='" + username + "';";
+        boolean isExist = false;
+
+        try (Connection conn = DriverManager.getConnection(driverURL);
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql)){
+            if(rs.next()) {
+                isExist = true;
+            }
+        } catch (Exception ex) {
+            System.out.print(ex);
+        }
+        return isExist;
+    }
 }
