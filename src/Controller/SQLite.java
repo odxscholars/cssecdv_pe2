@@ -336,6 +336,7 @@ public class SQLite {
         return user;
     }
 
+
     public boolean isUserExist(String username) {
         String sql = "SELECT username FROM users WHERE username='" + username + "';";
         boolean isExist = false;
@@ -350,5 +351,20 @@ public class SQLite {
             System.out.print(ex);
         }
         return isExist;
+    }
+    public boolean validateUser(String username, String password) {
+        String sql = "SELECT username FROM users WHERE username='" + username + "' AND password='" + password + "';";
+        boolean isValid = false;
+
+        try (Connection conn = DriverManager.getConnection(driverURL);
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql)){
+            if(rs.next()) {
+                isValid = true;
+            }
+        } catch (Exception ex) {
+            System.out.print(ex);
+        }
+        return isValid;
     }
 }

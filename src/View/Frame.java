@@ -1,6 +1,8 @@
 package View;
 
 import Controller.Main;
+import Model.User;
+
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
@@ -263,6 +265,14 @@ public class Frame extends javax.swing.JFrame {
     public boolean isUserExist(String username){
 
         return main.sqlite.isUserExist(username);
+    }
+
+    public boolean validateUser(String username, String password){
+        if (main.sqlite.isUserExist(username)) {
+            return main.sqlite.validateUser(username, password);
+        } else {
+            return false;
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
