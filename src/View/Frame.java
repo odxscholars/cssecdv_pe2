@@ -248,6 +248,44 @@ public class Frame extends javax.swing.JFrame {
     
     public void mainNav(){
         frameView.show(Container, "homePnl");
+        if (currentUser != null) {
+            switch (currentUser.getRole()) {
+                case 5: // Admin
+                    adminBtn.setVisible(true);
+                    managerBtn.setVisible(false);
+                    staffBtn.setVisible(false);
+                    clientBtn.setVisible(false);
+                    adminHomePnl.showPnl("home");
+                    contentView.show(Content, "adminHomePnl");
+                    break;
+                case 4: // Manager
+                    adminBtn.setVisible(false);
+                    managerBtn.setVisible(true);
+                    staffBtn.setVisible(false);
+                    clientBtn.setVisible(false);
+                    managerHomePnl.showPnl("home");
+                    contentView.show(Content, "managerHomePnl");
+                    break;
+                case 3: // Staff
+                    adminBtn.setVisible(false);
+                    managerBtn.setVisible(false);
+                    staffBtn.setVisible(true);
+                    clientBtn.setVisible(false);
+                    staffHomePnl.showPnl("home");
+                    contentView.show(Content, "staffHomePnl");
+                    break;
+                case 2: // Client
+                    adminBtn.setVisible(false);
+                    managerBtn.setVisible(false);
+                    staffBtn.setVisible(false);
+                    clientBtn.setVisible(true);
+                    clientHomePnl.showPnl("home");
+                    contentView.show(Content, "clientHomePnl");
+                    break;
+            }
+        }
+
+
     }
     
     public void loginNav(){
@@ -269,7 +307,11 @@ public class Frame extends javax.swing.JFrame {
 
     public boolean validateUser(String username, String password){
         if (main.sqlite.isUserExist(username)) {
-            return main.sqlite.validateUser(username, password);
+            boolean valid = main.sqlite.validateUser(username, password);
+            if (valid) {
+                this.currentUser = main.sqlite.getUser(username); // fetch user from DB
+            }
+            return valid;
         } else {
             return false;
         }
@@ -286,5 +328,6 @@ public class Frame extends javax.swing.JFrame {
     private javax.swing.JButton logoutBtn;
     private javax.swing.JButton managerBtn;
     private javax.swing.JButton staffBtn;
+    public User currentUser = null;
     // End of variables declaration//GEN-END:variables
 }

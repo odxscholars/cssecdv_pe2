@@ -97,20 +97,30 @@ public class Register extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void registerBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerBtnActionPerformed
-        if (usernameFld.getText().isEmpty() || passwordFld.getText().isEmpty() || confpassFld.getText().isEmpty()) {
+        if (usernameFld.getText().isEmpty() || passwordFld.getText().isEmpty() || confpassFld.getText().isEmpty()) { // Check if any field is empty
             javax.swing.JOptionPane.showMessageDialog(frame, "Please fill in all fields.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
             return;
-        } else if (!passwordFld.getText().equals(confpassFld.getText())) {
+        } else if (!passwordFld.getText().equals(confpassFld.getText())) { // Check if passwords match
             javax.swing.JOptionPane.showMessageDialog(frame, "Passwords do not match.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
             return;
-        } else if (frame.isUserExist(usernameFld.getText())) {
+        } else if (frame.isUserExist(usernameFld.getText())) { // Check if username already exists
             javax.swing.JOptionPane.showMessageDialog(frame, "Username already exists.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        } else if (passwordFld.getText().length() < 8 ) { // Check if password is at least 8 characters long
+            javax.swing.JOptionPane.showMessageDialog(frame, "Password must be at least 8 characters long.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        } // check if password topology is strong
+        else if (isStrongPassword(passwordFld.getText())) {
+            javax.swing.JOptionPane.showMessageDialog(frame, "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
             return;
         }
         frame.registerAction(usernameFld.getText(), passwordFld.getText(), confpassFld.getText());
         frame.loginNav();
     }//GEN-LAST:event_registerBtnActionPerformed
-
+    private boolean isStrongPassword(String password) {
+        // Check if password contains at least one uppercase letter, one lowercase letter, one digit, and one special character
+        return password.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$");
+    }
 
 
     private void backBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backBtnActionPerformed
