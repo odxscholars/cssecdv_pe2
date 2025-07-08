@@ -97,6 +97,16 @@ public class Register extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void registerBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerBtnActionPerformed
+        if (usernameFld.getText().isEmpty() || passwordFld.getText().isEmpty() || confpassFld.getText().isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(frame, "Please fill in all fields.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        } else if (!passwordFld.getText().equals(confpassFld.getText())) {
+            javax.swing.JOptionPane.showMessageDialog(frame, "Passwords do not match.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        } else if (passwordFld.getText().length() < 8) {
+            javax.swing.JOptionPane.showMessageDialog(frame, "Password must be at least 8 characters long.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         frame.registerAction(usernameFld.getText(), passwordFld.getText(), confpassFld.getText());
         frame.loginNav();
     }//GEN-LAST:event_registerBtnActionPerformed
