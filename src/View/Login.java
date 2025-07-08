@@ -1,5 +1,6 @@
-
 package View;
+
+import javax.swing.JPasswordField;
 
 public class Login extends javax.swing.JPanel {
 
@@ -15,7 +16,8 @@ public class Login extends javax.swing.JPanel {
 
         jLabel1 = new javax.swing.JLabel();
         usernameFld = new javax.swing.JTextField();
-        passwordFld = new javax.swing.JTextField();
+        // SECURITY FIX: Changed to JPasswordField for better password security
+        passwordFld = new javax.swing.JPasswordField();
         registerBtn = new javax.swing.JButton();
         loginBtn = new javax.swing.JButton();
 
@@ -82,25 +84,49 @@ public class Login extends javax.swing.JPanel {
                 .addContainerGap(126, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+    
     private void loginBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginBtnActionPerformed
-        String username = usernameFld.getText();
-        String password = passwordFld.getText();
+        String username = usernameFld.getText().trim();
+        String password = new String(passwordFld.getPassword());
+        
+        // SECURITY: Input validation
+        if (username.isEmpty() || password.isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Please enter both username and password.", 
+                "Login Error", 
+                javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
         if (frame.validateUser(username, password)) {
+            // Clear password field immediately after use for security
+            clearFields();
             frame.mainNav();
         } else {
-            javax.swing.JOptionPane.showMessageDialog(this, "Invalid username or password.", "Login Failed", javax.swing.JOptionPane.ERROR_MESSAGE);
+            // Clear password field on failed login for security
+            passwordFld.setText("");
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Invalid username or password.", 
+                "Login Failed", 
+                javax.swing.JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_loginBtnActionPerformed
 
     private void registerBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerBtnActionPerformed
+        clearFields();
         frame.registerNav();
     }//GEN-LAST:event_registerBtnActionPerformed
 
+    // NEW: Security method to clear sensitive data
+    public void clearFields() {
+        usernameFld.setText("");
+        passwordFld.setText("");
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton loginBtn;
-    private javax.swing.JTextField passwordFld;
+    private javax.swing.JPasswordField passwordFld; // Changed from JTextField to JPasswordField
     private javax.swing.JButton registerBtn;
     private javax.swing.JTextField usernameFld;
     // End of variables declaration//GEN-END:variables

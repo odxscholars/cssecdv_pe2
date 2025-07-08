@@ -7,6 +7,7 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
 import javax.swing.WindowConstants;
+import javax.swing.JOptionPane;
 
 public class Frame extends javax.swing.JFrame {
 
@@ -181,27 +182,46 @@ public class Frame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    // FIXED: Added proper authorization checks for each button action
     private void adminBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adminBtnActionPerformed
+        if (!isAuthorized(5)) {
+            showUnauthorizedMessage();
+            return;
+        }
         adminHomePnl.showPnl("home");
         contentView.show(Content, "adminHomePnl");
     }//GEN-LAST:event_adminBtnActionPerformed
 
     private void managerBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_managerBtnActionPerformed
+        if (!isAuthorized(4)) {
+            showUnauthorizedMessage();
+            return;
+        }
         managerHomePnl.showPnl("home");
         contentView.show(Content, "managerHomePnl");
     }//GEN-LAST:event_managerBtnActionPerformed
 
     private void staffBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_staffBtnActionPerformed
+        if (!isAuthorized(3)) {
+            showUnauthorizedMessage();
+            return;
+        }
         staffHomePnl.showPnl("home");
         contentView.show(Content, "staffHomePnl");
     }//GEN-LAST:event_staffBtnActionPerformed
 
     private void clientBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clientBtnActionPerformed
+        if (!isAuthorized(2)) {
+            showUnauthorizedMessage();
+            return;
+        }
         clientHomePnl.showPnl("home");
         contentView.show(Content, "clientHomePnl");
     }//GEN-LAST:event_clientBtnActionPerformed
 
     private void logoutBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutBtnActionPerformed
+        // Clear current user session
+        currentUser = null;
         frameView.show(Container, "loginPnl");
     }//GEN-LAST:event_logoutBtnActionPerformed
 
@@ -246,46 +266,58 @@ public class Frame extends javax.swing.JFrame {
         this.setVisible(true);
     }
     
+    // ENHANCED: Improved mainNav with better security checks
     public void mainNav(){
         frameView.show(Container, "homePnl");
         if (currentUser != null) {
+            // Set all buttons invisible first
+            adminBtn.setVisible(false);
+            managerBtn.setVisible(false);
+            staffBtn.setVisible(false);
+            clientBtn.setVisible(false);
+            
             switch (currentUser.getRole()) {
-                case 5: // Admin
+                case 5: // Admin - Can access everything
                     adminBtn.setVisible(true);
-                    managerBtn.setVisible(false);
-                    staffBtn.setVisible(false);
-                    clientBtn.setVisible(false);
+                    managerBtn.setVisible(true);
+                    staffBtn.setVisible(true);
+                    clientBtn.setVisible(true);
                     adminHomePnl.showPnl("home");
                     contentView.show(Content, "adminHomePnl");
                     break;
-                case 4: // Manager
-                    adminBtn.setVisible(false);
+                case 4: // Manager - Can access Manager, Staff, and Client
                     managerBtn.setVisible(true);
-                    staffBtn.setVisible(false);
-                    clientBtn.setVisible(false);
+                    staffBtn.setVisible(true);
+                    clientBtn.setVisible(true);
                     managerHomePnl.showPnl("home");
                     contentView.show(Content, "managerHomePnl");
                     break;
-                case 3: // Staff
-                    adminBtn.setVisible(false);
-                    managerBtn.setVisible(false);
+                case 3: // Staff - Can access Staff and Client
                     staffBtn.setVisible(true);
-                    clientBtn.setVisible(false);
+                    clientBtn.setVisible(true);
                     staffHomePnl.showPnl("home");
                     contentView.show(Content, "staffHomePnl");
                     break;
-                case 2: // Client
-                    adminBtn.setVisible(false);
-                    managerBtn.setVisible(false);
-                    staffBtn.setVisible(false);
+                case 2: // Client - Can only access Client
                     clientBtn.setVisible(true);
                     clientHomePnl.showPnl("home");
                     contentView.show(Content, "clientHomePnl");
                     break;
+                case 1: // Disabled - No access
+                    showDisabledAccountMessage();
+                    frameView.show(Container, "loginPnl");
+                    currentUser = null;
+                    break;
+                default:
+                    showUnauthorizedMessage();
+                    frameView.show(Container, "loginPnl");
+                    currentUser = null;
+                    break;
             }
+        } else {
+            // If no user is logged in, redirect to login
+            frameView.show(Container, "loginPnl");
         }
-
-
     }
     
     public void loginNav(){
@@ -301,7 +333,6 @@ public class Frame extends javax.swing.JFrame {
     }
 
     public boolean isUserExist(String username){
-
         return main.sqlite.isUserExist(username);
     }
 
@@ -310,11 +341,43 @@ public class Frame extends javax.swing.JFrame {
             boolean valid = main.sqlite.validateUser(username, password);
             if (valid) {
                 this.currentUser = main.sqlite.getUser(username); // fetch user from DB
+                
+                // Check if account is disabled
+                if (currentUser != null && currentUser.getRole() == 1) {
+                    showDisabledAccountMessage();
+                    currentUser = null;
+                    return false;
+                }
             }
             return valid;
         } else {
             return false;
         }
+    }
+
+    // NEW: Authorization helper methods
+    private boolean isAuthorized(int requiredRole) {
+        if (currentUser == null) {
+            return false;
+        }
+        
+        // Role hierarchy: Admin(5) > Manager(4) > Staff(3) > Client(2) > Disabled(1)
+        // Users can access their role and lower roles
+        return currentUser.getRole() >= requiredRole;
+    }
+    
+    private void showUnauthorizedMessage() {
+        JOptionPane.showMessageDialog(this, 
+            "Access Denied: You do not have permission to access this section.", 
+            "Unauthorized Access", 
+            JOptionPane.WARNING_MESSAGE);
+    }
+    
+    private void showDisabledAccountMessage() {
+        JOptionPane.showMessageDialog(this, 
+            "Your account has been disabled. Please contact an administrator.", 
+            "Account Disabled", 
+            JOptionPane.ERROR_MESSAGE);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
